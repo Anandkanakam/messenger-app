@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messenger App</title>
+</head>
+<body>
+    <h1>Messenger</h1>
+
+    <form action="/send" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="message">Message:</label>
+        <input type="text" id="message" name="message" required><br><br>
+
+        <input type="submit" value="Send">
+    </form>
+
+    <h2>Messages:</h2>
+    <ul>
+        {% for user, user_messages in messages.items() %}
+            <li>{{ user }}:
+                <ul>
+                    {% for msg in user_messages %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

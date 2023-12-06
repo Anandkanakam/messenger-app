@@ -1,0 +1,176 @@
+.container{
+    width:400; 
+    margin-top: auto;
+    margin-top:2%;
+    font-family:sans-serif;
+    letter-spacing:1px;
+    overflow: hidden;
+     
+}
+img{
+    max-width:100%;
+    border-radius:50%;
+    width:80px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    margin-left:1% ;
+    float:left;
+}
+.header{
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    width:100%;
+    height:6%;
+    border-bottom: none;
+    display:inline-block;
+    background-color: black;
+}
+.active{
+    width: 120px;
+    float: left;
+    margin-top:20px;
+    color: #fff;
+    margin-bottom:5px;
+}
+.active h4{
+    font-size:30px;
+    margin-left:10px;
+    color: #fff;
+}
+.active h6{
+    font-size: 10px;
+    margin-left:10px;
+    line-height: 2px;
+    color:#fff;
+    
+}
+.chat-page{
+    padding: 0 0 50px 0;
+}
+.msg-inbox{
+   overflow: hidden;
+   border:1px solid #ccc;
+   padding-bottom: 30px;
+}
+.chat{
+    padding:30px 15px 0px 25px;
+
+}
+.msg-page{
+    overflow-y:auto ;
+    height: 516px;
+    width:1097px;
+}
+
+
+.recieved-msg{
+    display: inline-block;
+    padding: 0 0 10px;
+    vertical-align: top;
+    width: 92%;
+
+}
+.recieved-msg-inbox{
+    width:10%;
+}
+.recieved-msg-inbox p{
+    background-color: whitesmoke;
+    border-radius: 10px;
+    color:black;
+    font-size: 15px;
+    margin:0;
+    padding: 5px 10px 5px 12px;
+    width: 100%;
+}
+.day{
+    margin-left:500px;
+    margin-top:200px;
+}
+.time{
+    color: #777;
+    display: block;
+    font-size:10px;
+    margin: 8px 0 0;
+    margin-left:50px;
+}
+.outgoing-chats{
+    overflow: hidden;
+    margin: 26px 20px;
+}
+.outgoing-chat-msg p{
+    background-color: black;
+    color:white;
+    border-radius: 10px;
+    font-size: 15px;
+    margin-left:800px;
+    padding: 5px 10px 5px 12px;
+    width:9%;
+    text-align: center;
+}
+.outgoing-chat-msg .time{
+    margin-left:880px;
+}
+.msg-bottom{
+    position: relative;
+    height: 15%;
+    background-color:black;
+}
+.Form-control{
+    border: none;
+    border-radius:20px;
+    margin-left:130px;
+    width:650px;
+    height:40px;
+}
+.input-group-text{
+    background-color:white;
+    border:none;
+    margin-top:16px;
+    border-radius:20px;
+    color: white;
+    margin-left: 0px;
+}
+.upload{
+    position: relative;
+    padding: 6px;
+    font-size: 15px;
+    line-height: 1.5;
+    border-radius: 3px;
+    color:black;
+    background-color: #ffc100;
+    border:0;
+    overflow:hidden;
+    transition: 0.2s;
+    margin: 5px;
+}
+.upload input[type="file"]{
+    cursor: pointer;
+    position: absolute;
+    top:0;
+    left:0;
+    transform: scale(5);
+    opacity: 0;
+}
+
+.uploadbtn{
+    position: relative;
+    padding: 6px;
+    font-size: 15px;
+    line-height: 1.5;
+    border-radius: 3px;
+    color:white;
+    background-color: #ffc100;
+    border:0;
+    overflow:hidden;
+    transition: 0.2s;
+    margin: 5px;
+}
+.uploadbtn input[type="file"]{
+    cursor: pointer;
+    position: absolute;
+    top:0;
+    left:0;
+    transform: scale(5);
+    opacity: 0;
+}
+

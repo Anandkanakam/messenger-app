@@ -1,0 +1,25 @@
+.bgimg{
+    background-image: url("https://images.pexels.com/photos/440731/pexels-photo-440731.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+    background-size: cover;
+    width:100vw;
+    height:100vh;
+    position: fixed;
+}
+.link{
+    
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: black;
+    margin-left:150px;
+    margin-top:50px;
+    padding:60px;
+    font-weight: bold;
+    font-size:20px;
+
+}
+.paraline{
+    margin-left:50px;
+    padding:10px;
+}
+select{
+    margin-left: 100px;
+}
