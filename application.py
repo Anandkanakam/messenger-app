@@ -8,10 +8,8 @@ from key import *
 import os
 app=Flask(__name__)
 app.config["SESSION_TYPE"] = "filesystem"
-session(app)
-excel.init_excel(app)
 app.secret_key="secret_key"
-db=os.environ['RDS_DB_NAME']
+'''db=os.environ['RDS_DB_NAME']
 user=os.environ['RDS_USERNAME']
 password=os.environ['RDS_PASSWORD']
 host=os.environ['RDS_HOSTNAME']
@@ -25,11 +23,11 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor.execute('create table if not exists profile(name varchar(50) DEFAULT NULL,about varchar(50) DEFAULT NULL)')
     cursor.execute('create table if not exists files(follower varchar(150) DEFAULT NULL,following varchar(150) DEFAULT NULL,file longblob,created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,KEY follower (`follower`),KEY following(`following`),CONSTRAINT `files_ibfk_1` FOREIGN KEY (`follower`) REFERENCES users(`id`),CONSTRAINT `files_ibfk_2` FOREIGN KEY (`following`) REFERENCES users(`id`)')
 
-mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)    
-#app.config['MYSQL_HOST'] ='localhost'
-#app.config['MYSQL_USER'] = 'root'
-#app.config['MYSQL_PASSWORD']='Anand@19'
-#app.config['MYSQL_DB']='mma'
+mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)''' 
+app.config['MYSQL_HOST'] ='localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD']='Anand@19'
+app.config['MYSQL_DB']='mma'
 mysql=MySQL(app)
 @app.route('/')
 def home():
@@ -235,6 +233,6 @@ def download(filename):
     cursor.execute('SELECT file from files where filename=%s',[filename])
     data=cursor.fetchone()[0]
     return send_file(BytesIO(data),download_name=filename,as_attachment=True)
-    if __name__=="__main__":
+if __name__=="__main__":
     app.run()
 
