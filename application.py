@@ -16,10 +16,20 @@ user=os.environ['RDS_USERNAME']
 password=os.environ['RDS_PASSWORD']
 host=os.environ['RDS_HOSTNAME']
 port=os.environ['RDS_PORT']
-'''app.config['MYSQL_HOST'] ='localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD']='Anand@19'
-app.config['MYSQL_DB']='mma''''
+with mysql.connector.connect(host=host,user=user,password=password,db=db) as conn:
+    cursor=conn.cursor(buffered=True)
+    cursor.execute('create table if not exists users(id varchar(80) NOT NULL,first_name varchar(50) DEFAULT NULL,last_name varchar(50) DEFAULT NULL,email varchar(100) DEFAULT NULL,password varchar(50) DEFAULT NULL,created timestamp NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY (`id`)')
+    cursor.execute('create table if not exists friends(followers varchar(90) DEFAULT NULL,following varchar(90) DEFAULT NULL,KEY followers(`followers`),KEY following(`following`),CONSTRAINT `friends_ibfk_1` FOREIGN KEY (`followers`) REFERENCES users(`id`) ON DELETE CASCADE ON UPDATE CASCADE,CONSTRAINT `friends_ibfk_2` FOREIGN KEY (`following`) REFERENCES users(`id`)')
+    cursor.execute('create table if not exists login(id varchar(80) DEFAULT NULL,password varchar(50) DEFAULT NULL)')
+    cursor.execute('create table if not exists messenger(followers varchar(80) DEFAULT NULL,following varchar(80) DEFAULT NULL,message text,created_at datetime DEFAULT CURRENT_TIMESTAMP,KEY following(`following`),KEY followers(`followers`),CONSTRAINT `messenger_ibfk_1` FOREIGN KEY (`followers`) REFERENCES users(`id`) ON DELETE CASCADE ON UPDATE CASCADE,CONSTRAINT `messenger_ibfk_2` FOREIGN KEY (`following`) REFERENCES users(`id`) ON DELETE CASCADE ON UPDATE CASCADE)')
+    cursor.execute('create table if not exists profile(name varchar(50) DEFAULT NULL,about varchar(50) DEFAULT NULL)')
+    cursor.execute('create table if not exists files(follower varchar(150) DEFAULT NULL,following varchar(150) DEFAULT NULL,file longblob,created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,KEY follower (`follower`),KEY following(`following`),CONSTRAINT `files_ibfk_1` FOREIGN KEY (`follower`) REFERENCES users(`id`),CONSTRAINT `files_ibfk_2` FOREIGN KEY (`following`) REFERENCES users(`id`)')
+
+mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)    
+#app.config['MYSQL_HOST'] ='localhost'
+#app.config['MYSQL_USER'] = 'root'
+#app.config['MYSQL_PASSWORD']='Anand@19'
+#app.config['MYSQL_DB']='mma'
 mysql=MySQL(app)
 @app.route('/')
 def home():
