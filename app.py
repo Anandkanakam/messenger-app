@@ -1,15 +1,17 @@
 from flask import Flask,flash,redirect,render_template,url_for,request,jsonify,session,send_file,abort
-from flask_mysqldb import MySQL
 from io import BytesIO
+from flask_session import Session
 from sdmail import sendmail
 from tokenreset import token
 from itsdangerous import URLSafeTimedSerializer
 from key import *
+import mysql.connector
 import os
 app=Flask(__name__)
-app.config["SESSION_TYPE"] = "filesystem"
 app.secret_key="secret_key"
-'''db=os.environ['RDS_DB_NAME']
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+db=os.environ['RDS_DB_NAME']
 user=os.environ['RDS_USERNAME']
 password=os.environ['RDS_PASSWORD']
 host=os.environ['RDS_HOSTNAME']
@@ -23,18 +25,14 @@ with mysql.connector.connect(host=host,user=user,password=password,db=db) as con
     cursor.execute('create table if not exists profile(name varchar(50) DEFAULT NULL,about varchar(50) DEFAULT NULL)')
     cursor.execute('create table if not exists files(follower varchar(150) DEFAULT NULL,following varchar(150) DEFAULT NULL,file longblob,created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,KEY follower (`follower`),KEY following(`following`),CONSTRAINT `files_ibfk_1` FOREIGN KEY (`follower`) REFERENCES users(`id`),CONSTRAINT `files_ibfk_2` FOREIGN KEY (`following`) REFERENCES users(`id`)')
 
-mydb=mysql.connector.connect(host=host,user=user,password=password,db=db)''' 
-app.config['MYSQL_HOST'] ='localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD']='Anand@19'
-app.config['MYSQL_DB']='mma'
-mysql=MySQL(app)
+mydb=mysql.connector.connect(host=host,user=user,password=password,db=db) 
+#mydb=mysql.connector.connect(host='localhost',user='root',password='Anand@19',db='mma')
 @app.route('/')
 def home():
     return render_template('home.html')
 @app.route('/home/<id1>')
 def chat(id1):
-    cursor=mysql.connection.cursor()
+    cursor=mydb.cursor(buffered=True)
     cursor.execute('SELECT following from friends where followers=%s',[id1])
     data=cursor.fetchall()
     return render_template('chat.html',id1=id1,data=data)
@@ -46,7 +44,7 @@ def signup():
         Last_Name=request.form['Last_Name']
         Email=request.form['Email']
         Password=request.form['Password']
-        cursor=mysql.connection.cursor()
+        cursor=mydb.cursor(buffered=True)
         cursor.execute('select count(*) from users where first_name=%s',[First_Name])
         count=cursor.fetchone()[0]
         cursor.execute('select count(*) from users where email=%s',[Email])
@@ -74,7 +72,7 @@ def confirm(token):
         #print(e)
         return 'Link Expired register again'
     else:
-        cursor=mysql.connection.cursor()
+        cursor=mydb.cursor(buffered=True)
         First_Name=data['First_Name']
         cursor.execute('select count(*) from users where first_name=%s',[First_Name])
         count=cursor.fetchone()[0]
@@ -92,7 +90,7 @@ def confirm(token):
 def forgotpassword():
     if request.method=='POST':
         id1 = request.form['id']
-        cursor=mysql.connection.cursor() 
+        cursor=mydb.cursor(buffered=True) 
         cursor.execute('select id from users') 
         deta=cursor.fetchall()
         if (id1,) in deta:
@@ -116,7 +114,7 @@ def resetpwd(token):
             npwd = request.form['npassword']
             cpwd = request.form['cpassword']
             if npwd == cpwd:
-                cursor=mysql.connection.cursor()
+                cursor=mydb.cursor(buffered=True)
                 cursor.execute('update users set password=%s where id=%s',[npwd,id1])
                 mysql.connection.commit()
                 cursor.close()
@@ -133,7 +131,7 @@ def login():
     if request.method=="POST":
         user=request.form['id']
         password=request.form['Password']
-        cursor=mysql.connection.cursor()
+        cursor=mydb.cursor(buffered=True)
         cursor.execute('SELECT Id from USERS')
         users=cursor.fetchall()            
         cursor.execute('select password from Users where Id=%s',[user])
@@ -156,7 +154,7 @@ def logout():
     return redirect(url_for('home'))
 @app.route('/addcontact',methods=['GET','POST'])
 def addcontact():
-    cursor=mysql.connection.cursor()
+    cursor=mydb.cursor(buffered=True)
     cursor.execute('SELECT id  from users where id!=%s',[session.get('user')])
     data=cursor.fetchall()
     cursor.execute('select following from friends where followers=%s',[session.get('user')])
@@ -166,7 +164,7 @@ def addcontact():
     if request.method=="POST":
         if 'Enter_Username' in request.form:
             Enter_Username=request.form['Enter_Username']
-            cursor=mysql.connection.cursor()
+            cursor=mydb.cursor(buffered=True)
             cursor.execute('insert into friends values(%s,%s)',[session.get('user'),Enter_Username])
             mysql.connection.commit()
             return redirect(url_for('chat',id1=session.get('user')))
@@ -176,7 +174,7 @@ def profilepage():
     if request.method=="POST":
         name=request.form['name']
         about=request.form['about']
-        cursor=mysql.connection.cursor()
+        cursor=mydb.cursor(buffered=True)
         cursor.execute('SELECT following from friends where followers=%s',[session.get('user')])
         data=cursor.fetchall()
         cursor.execute('insert into profile(name,about) values(%s,%s)',[name,about])
@@ -194,7 +192,7 @@ def back():
 @app.route('/message/<id1>',methods=['GET','POST'])
 def message(id1):
     if session.get('user'):
-        cursor=mysql.connection.cursor()
+        cursor=mydb.cursor(buffered=True)
         cursor.execute("SELECT message,date_format(created_at,'%%h:%%i %%p') as date from messenger where followers=%s and following=%s order by date",(session.get('user'),id1))
         sender=cursor.fetchall()
         cursor.execute("SELECT message,date_format(created_at,'%%h:%%i %%p') as date from messenger where followers=%s and following=%s order by date",(id1,session.get('user')))
@@ -208,7 +206,7 @@ def message(id1):
             if 'file' in request.files:
                 file=request.files['file']
                 filename=file.filename
-                cursor=mysql.connection.cursor()
+                cursor=mydb.cursor(buffered=True)
                 cursor.execute('INSERT INTO files (follower,following,filename,file) values(%s,%s,%s,%s)',(session.get('user'),id1,filename,file.read()))
                 mysql.connection.commit()
                 cursor.execute('select filename from files where follower=%s and following=%s',(session.get('user'),id1))
@@ -217,7 +215,7 @@ def message(id1):
                 reciever_files=cursor.fetchall()
                 return render_template('Messenger.html',id1=id1,sender=sender,reciever=reciever,sender_files=sender_files,reciever_files=reciever_files)
             message=request.form['Message']
-            cursor=mysql.connection.cursor()
+            cursor=mydb.cursor(buffered=True)
             cursor.execute('INSERT INTO messenger(followers,following,message) values(%s,%s,%s)',(session['user'],id1,message))
             mysql.connection.commit()
             cursor.execute("SELECT message,date_format(created_at,'%%h:%%i %%p') as date from messenger where followers=%s and following=%s order by date",(session.get('user'),id1))
@@ -229,7 +227,7 @@ def message(id1):
 
 @app.route('/download/<filename>')
 def download(filename):
-    cursor=mysql.connection.cursor()
+    cursor=mydb.cursor(buffered=True)
     cursor.execute('SELECT file from files where filename=%s',[filename])
     data=cursor.fetchone()[0]
     return send_file(BytesIO(data),download_name=filename,as_attachment=True)
