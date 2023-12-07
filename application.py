@@ -5,13 +5,21 @@ from sdmail import sendmail
 from tokenreset import token
 from itsdangerous import URLSafeTimedSerializer
 from key import *
+import os
 app=Flask(__name__)
+app.config["SESSION_TYPE"] = "filesystem"
+session(app)
+excel.init_excel(app)
 app.secret_key="secret_key"
-app.config['MYSQL_HOST'] ='localhost'
+db=os.environ['RDS_DB_NAME']
+user=os.environ['RDS_USERNAME']
+password=os.environ['RDS_PASSWORD']
+host=os.environ['RDS_HOSTNAME']
+port=os.environ['RDS_PORT']
+'''app.config['MYSQL_HOST'] ='localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD']='Anand@19'
-app.config['MYSQL_DB']='mma'
-app.config["SESSION_TYPE"] = "filesystem"
+app.config['MYSQL_DB']='mma''''
 mysql=MySQL(app)
 @app.route('/')
 def home():
@@ -164,7 +172,7 @@ def profilepage():
         cursor.execute('SELECT following from friends where followers=%s',[session.get('user')])
         data=cursor.fetchall()
         cursor.execute('insert into profile(name,about) values(%s,%s)',[name,about])
-        cursor.fetchone()
+        cursor.fetchall()
         cursor.close()
         return redirect(url_for('chat',id1=session.get('user')))
     else:
@@ -217,5 +225,6 @@ def download(filename):
     cursor.execute('SELECT file from files where filename=%s',[filename])
     data=cursor.fetchone()[0]
     return send_file(BytesIO(data),download_name=filename,as_attachment=True)
-app.run(debug=True,use_reloader=True)
+    if __name__=="__main__":
+    app.run()
 
